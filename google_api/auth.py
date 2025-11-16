@@ -4,14 +4,14 @@ from google.auth.transport.requests import Request
 import os.path
 import json
 
-# Scopes required for Calendar access
+
 SCOPES = [
     'https://www.googleapis.com/auth/calendar',
     'https://www.googleapis.com/auth/calendar.events'
 ]
 
-CREDENTIALS_FILE = 'credentials.json'  # OAuth client credentials from Google Cloud Console
-TOKEN_FILE = 'creds.json'  # Stored user access/refresh tokens
+CREDENTIALS_FILE = 'credentials.json'  
+TOKEN_FILE = 'creds.json'  
 
 def get_credentials():
     """
@@ -27,7 +27,6 @@ def get_credentials():
     """
     creds = None
     
-    # Check if we already have stored credentials
     if os.path.exists(TOKEN_FILE):
         try:
             with open(TOKEN_FILE, 'r') as token:
@@ -36,11 +35,9 @@ def get_credentials():
         except Exception as e:
             print(f"Error loading credentials: {e}")
             creds = None
-    
-    # If credentials don't exist or are invalid, get new ones
+
     if not creds or not creds.valid:
         if creds and creds.expired and creds.refresh_token:
-            # Refresh the expired credentials
             print("Refreshing expired credentials...")
             try:
                 creds.refresh(Request())
@@ -48,7 +45,7 @@ def get_credentials():
                 print(f"Error refreshing credentials: {e}")
                 creds = None
         
-        # If we still don't have valid credentials, start OAuth flow
+
         if not creds:
             if not os.path.exists(CREDENTIALS_FILE):
                 print(f"Error: {CREDENTIALS_FILE} not found!")
@@ -65,7 +62,7 @@ def get_credentials():
             
             print("Authentication successful!")
         
-        # Save the credentials for future use
+
         with open(TOKEN_FILE, 'w') as token:
             token.write(creds.to_json())
             print(f"Credentials saved to {TOKEN_FILE}")

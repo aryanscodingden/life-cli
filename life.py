@@ -1,3 +1,4 @@
+from calendar import calendar
 import typer
 from Core.storage import *
 from Core.storage import Task
@@ -10,33 +11,57 @@ import os
 
 app = typer.Typer()
 
-@app.command()
-def add(title: str, note: str = "", due: str = None, duration: int=None, keep:bool = False):
-    tid = addTask(title, note, due, duration, keep)
-    typer.echo(f"Added Task #{tid}")
+calender_app = typer.Typer()
+task_app = typer.Typer()
 
-@app.command()
-def show():
+app.add_typer(calender_app, name="calender")
+app.add_typer(task_app, name="task")
+
+@calendar.command("add")
+def calender_add(name:str, date: str, time:str):
+    """
+    Create a calender event.
+    Format: calendar <name> <DD:MM:YY> <HH:MM>
+    """
+    try:
+        day, month, year = date.split(":")
+        hour, minute = time.split(":")
+        dt = datetime (
+            year = int(year),
+            month = int(month),
+            day = int(day),
+            hour = int(hour),
+            minute=int(minute)
+        )
+    except:
+        typer.echo("Invalid date/time format. Use DD:MM:YY HH:MM Format")
+
+    tid = addTask(name, "", dt.isoformat(), None, False)
+    event_id = create_event(get_tasks(tid))
+    update_calender_event(tid, event_id)
+
+    typer.echo(f"Calender event created: {name}")
+
+@task_app.command("add")
+def task_add(name: str, date: str):
+    """
+    Create a TO-DO list 
+    Format: task add "Task Name" DD:MM
+    """
+    try:
+        day, month = date.split(":")
+        dt = datetime(datetime.now().year, int(month), int(day))
+    except:
+        typer.echo("Invalid date format")
+        return
+    tid = addTask(name, "", dt.isoformat(), None, False)
+    typer.echo(f"Task added: {name}")
+
+@task_app.command("list")
+def task_list():
+    """Show all tasks."""
     tasks = get_tasks()
     print_tasks(tasks)
-
-@app.command()
-def done(task_id: int):
-    tasks = get_tasks()
-    task = next((t for t in tasks if t.id == task_id), None)
-
-    if not task:
-        typer.echo("Task Not Found")
-        raise typer.Exit()
-
-    if task.calendar_event_id:
-        delete_event(task.calendar_event_id)
-
-    if task.keep_note_id:
-        delete_keep_note(task.keep_note_id)
-
-    mark_done(task_id)
-    typer.echo(f"Completed task #{task_id}")
 
 @app.command()
 def sync():
@@ -45,6 +70,7 @@ def sync():
         if task.due and not task.calender_event_id:
             event_id = create_event(task)
             update_calender_event(task.id, event_id)
+
         if task.keep and not task.keep_note_id:
             note_id = create_keep_note(task)
             update_keep_note(task.id, note_id)
@@ -59,7 +85,6 @@ def sign_in():
     if os.path.exists("creds.json"):
         os.remove("creds.json")
         typer.echo("Removed existing credentials.")
-    
     try:
         creds = get_credentials()
         typer.echo("Successfully signed in to Google!")

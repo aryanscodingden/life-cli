@@ -25,3 +25,5 @@ def delete_event(event_id):
     service = build("calendar", "v3", credentials=creds)
     service.events().delete(calendarId="primary", eventId=event_id).execute()
 
+
+
