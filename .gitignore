@@ -1,5 +1,8 @@
-.credentials.json
-.token.pickle
-.token.json
-.keep_credentials.json
-.__pycache__/
+credentials.json
+token.pickle
+token.json
+creds.json
+keep_credentials.json
+__pycache__/
+*.pyc
+data/
