@@ -12,4 +12,5 @@ class Task:
     keep: bool
     calender_event_id: Optional[id]
     keep_note_id: Optional[str]
+    google_task_id: Optional[str]
 

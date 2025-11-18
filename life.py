@@ -1,5 +1,5 @@
-from calendar import calendar
 import typer
+from datetime import datetime
 from Core.storage import *
 from Core.storage import Task
 from Core.storage import update_keep_note
@@ -8,21 +8,22 @@ from google_api.keep_sync import create_keep_note, delete_keep_note
 from google_api.auth import get_credentials
 from Utils.printer import print_tasks
 import os
+from google_api.tasks_sync import sync_tasks_two_way
 
-app = typer.Typer()
+# from tkinter import tix
 
-calender_app = typer.Typer()
-task_app = typer.Typer()
+
+app = typer.Typer(help="Sync all tasks to Google Calendar and Google Keep.", add_completion=False)
+
+calender_app = typer.Typer(help="Manage your google calender events", add_completion=False)
+task_app = typer.Typer(help="Mange your google keep tasks", add_completion=False)
 
 app.add_typer(calender_app, name="calender")
 app.add_typer(task_app, name="task")
 
-@calendar.command("add")
+@calender_app.command("add")
 def calender_add(name:str, date: str, time:str):
-    """
-    Create a calender event.
-    Format: calendar <name> <DD:MM:YY> <HH:MM>
-    """
+    """Format: life.py calendar <name> <DD:MM:YY> <HH:MM>"""
     try:
         day, month, year = date.split(":")
         hour, minute = time.split(":")
@@ -35,19 +36,16 @@ def calender_add(name:str, date: str, time:str):
         )
     except:
         typer.echo("Invalid date/time format. Use DD:MM:YY HH:MM Format")
-
     tid = addTask(name, "", dt.isoformat(), None, False)
-    event_id = create_event(get_tasks(tid))
+    task = get_task(tid)
+    event_id = create_event(task)
     update_calender_event(tid, event_id)
 
     typer.echo(f"Calender event created: {name}")
 
 @task_app.command("add")
 def task_add(name: str, date: str):
-    """
-    Create a TO-DO list 
-    Format: task add "Task Name" DD:MM
-    """
+    """Format: task add "Task Name" DD:MM"""
     try:
         day, month = date.split(":")
         dt = datetime(datetime.now().year, int(month), int(day))
@@ -76,6 +74,11 @@ def sync():
             update_keep_note(task.id, note_id)
 
         typer.echo("Synced all tasks.")
+
+@app.command()
+def sync_tasks():
+    """Sync tasks with google tasks"""
+    sync_tasks_two_way()
 
 @app.command("sign-in")
 def sign_in():

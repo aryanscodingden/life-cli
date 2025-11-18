@@ -7,7 +7,8 @@ import json
 
 SCOPES = [
     'https://www.googleapis.com/auth/calendar',
-    'https://www.googleapis.com/auth/calendar.events'
+    #'https://www.googleapis.com/auth/calendar.events,'
+    'https://www.googleapis.com/auth/tasks'
 ]
 
 CREDENTIALS_FILE = 'credentials.json'  
