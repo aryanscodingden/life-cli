@@ -9,6 +9,8 @@ from google_api.auth import get_credentials
 from Utils.printer import print_tasks
 import os
 from google_api.tasks_sync import sync_tasks_two_way
+from utils.sync_helper import auto_sync
+
 
 # from tkinter import tix
 
@@ -40,7 +42,7 @@ def calender_add(name:str, date: str, time:str):
     task = get_task(tid)
     event_id = create_event(task)
     update_calender_event(tid, event_id)
-
+    auto_sync()
     typer.echo(f"Calender event created: {name}")
 
 @task_app.command("add")
@@ -53,6 +55,7 @@ def task_add(name: str, date: str):
         typer.echo("Invalid date format")
         return
     tid = addTask(name, "", dt.isoformat(), None, False)
+    auto_sync()
     typer.echo(f"Task added: {name}")
 
 @task_app.command("list")
