@@ -126,3 +126,17 @@ def mark_done(task_id):
     conn.commit()
     cur.close()
 
+def save_calendar_event(title, note, due, duration, event_id, keep=False):
+    conn = sqlite3.connect(DB)
+    cursor = conn.cursor()
+
+    cursor.execute("""
+        INSERT INTO tasks (title, note, due, duration, keep, calender_event_id)
+        VALUES (?, ?, ?, ?, ?, ?)
+    """, (title, note, due, duration, int(keep), event_id))
+
+    conn.commit()
+    task_id = cursor.lastrowid
+    conn.close()
+    return task_id
+

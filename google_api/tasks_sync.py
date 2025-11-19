@@ -1,17 +1,27 @@
 from googleapiclient.discovery import build
 from google_api.auth import get_credentials
-from Core.storage import get_tasks, update_calender_event, update_keep_note, mark_done, addTask, update_google_task_id
+from Core.storage import (
+    get_tasks,
+    update_calender_event,
+    update_keep_note,
+    mark_done,
+    addTask,
+    update_google_task_id,
+)
 from datetime import datetime
+
 
 def get_service():
     creds = get_credentials()
     return build("tasks", "v1", credentials=creds)
 
+
 def pull_google_tasks():
     """Fetch all google tasks"""
     service = get_service()
-    result = service.tasks().list(tasklist='@default').execute()
+    result = service.tasks().list(tasklist="@default").execute()
     return result.get("items", [])
+          
 
 def push_local_task_to_google(task):
     """Create google task."""
@@ -23,18 +33,20 @@ def push_local_task_to_google(task):
     }
 
     if task.due:
-        body['due'] = task.due.isoformat() + "Z"
+        body["due"] = task.due.isoformat() + "Z"
 
     created = service.tasks().insert(tasklist="@default", body=body).execute()
     return created["id"]
+
 
 def delete_google_task(gtask_id):
     service = get_service()
     service.tasks().delete(tasklist="@default", task=gtask_id).execute()
 
+
 def sync_tasks_two_way():
     """Full two-way sync"""
-    
+
     print("Starting Google tasks sync")
 
     local_tasks = get_tasks()
@@ -50,10 +62,9 @@ def sync_tasks_two_way():
         else:
             gtask = gmap.get(task.google_task_id)
             if gtask:
-                changed = (
-                    gtask.get("title") != task.title or 
-                    gtask.get("notes", "") != (task.note or "")
-                )
+                changed = gtask.get("title") != task.title or gtask.get(
+                    "notes", ""
+                ) != (task.note or "")
                 if changed:
                     update_google_task_id(task, task.google_task_id)
                     print(f"Updated on Google: {task.title}")
@@ -73,20 +84,13 @@ def sync_tasks_two_way():
             else:
                 due_dt = None
 
-            new_id = addTask(
-                title,
-                notes,
-                due_dt.isoformat() if due_dt else None
-            )
+            new_id = addTask(title, notes, due_dt.isoformat() if due_dt else None)
             update_google_task_id(new_id, gid)
 
-            print(f'Pulled from google: {title}')
-        
         if g.get("status") == "completed":
             for lt in local_tasks:
                 if lt.google_task_id == gid:
                     mark_done(lt.id)
-                    print(f"Completed in google, removed locally as well: {lt.title}")
 
     print("Google Tasks two-way sync complete.")
-
+    print("Run life.py list to see All Your Tasks From Google.")
