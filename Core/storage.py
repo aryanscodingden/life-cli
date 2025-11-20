@@ -133,7 +133,7 @@ def save_calendar_event(title, note, due, duration, event_id, keep=False):
     cursor.execute("""
         INSERT INTO tasks (title, note, due, duration, keep, calender_event_id)
         VALUES (?, ?, ?, ?, ?, ?)
-    """, (title, note, due, duration, int(keep), event_id))
+    """, (title, note, due, duration, 0,1, event_id))
 
     conn.commit()
     task_id = cursor.lastrowid

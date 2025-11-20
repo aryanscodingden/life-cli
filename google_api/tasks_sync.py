@@ -56,6 +56,9 @@ def sync_tasks_two_way():
 
     for task in local_tasks:
         if not task.google_task_id:
+            if getattr(task, "is_event", False):
+                continue
+            
             gid = push_local_task_to_google(task)
             update_google_task_id(task.id, gid)
             print(f"Created on google tasks {task.title}")

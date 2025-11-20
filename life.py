@@ -38,7 +38,23 @@ def calender_add(text: str):
         "due": dt,
         "duration": duration
     })()
-    event_id = create_event(temp)
+  
+    event_id = create_event(
+        type("TaskObj", (), {
+            "title": title,
+            "note": "",
+            "due": dt,
+            "duration": duration
+        })()
+    )
+
+    save_calendar_event(
+        title=title,
+        note="",
+        due=dt.isoformat(),
+        duration=duration,
+        event_id=event_id
+    )
 
     typer.echo(f"Calender event created: {title}")
 
