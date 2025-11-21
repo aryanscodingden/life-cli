@@ -1,0 +1,13 @@
+google-api-python-client
+google-auth
+google-auth-oauthlib
+google-auth-httplib2
+
+typer
+python-dateutil
+dateparser
+
+colorama
+tabulate
+
+requests
