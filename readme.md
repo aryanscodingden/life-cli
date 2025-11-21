@@ -7,6 +7,7 @@
 'life calendar add "meeting with john at 5pm on 20th nov"'
 'life calender add "doctor appointment next monday 9am"'
 '
+
 ### Time spent: 8h 37m
 ## Can sync to:
 ### Google Tasks for tasks

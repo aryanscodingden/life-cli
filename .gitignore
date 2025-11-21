@@ -5,4 +5,3 @@ creds.json
 keep_credentials.json
 __pycache__/
 *.pyc
-data/
