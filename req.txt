@@ -11,3 +11,4 @@ colorama
 tabulate
 
 requests
+gkeepapi
