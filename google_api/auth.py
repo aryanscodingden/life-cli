@@ -1,6 +1,5 @@
-from google.oauth2.credentials import Credentials
-from google_auth_oauthlib.flow import InstalledAppFlow
 from google.auth.transport.requests import Request
+from google.oauth2.credentials import Credentials
 import os.path
 import json
 import os
@@ -15,7 +14,6 @@ SCOPES = [
     'https://www.googleapis.com/auth/tasks'
 ]
 
-CREDENTIALS_FILE = 'credentials.json'
 TOKEN_FILE = 'creds.json'
 
 LOCAL_CALLBACK_PORT = 8080
@@ -33,7 +31,7 @@ def _run_local_server(timeout=300):
             self.send_response(200)
             self.send_header("Content-type", "text/html")
             self.end_headers()
-            self.wfile.write(b"<html><body>Authentication complete. You can close this window.</body></html>")
+            self.wfile.write(b"<html><body><h2>Authentication complete. You can close this window.</h2></body></html>")
             self.__class__.server_event.set()
 
         def log_message(self, *args):
@@ -64,7 +62,7 @@ def get_credentials():
     Returns:
         Credentials object for making API calls
     """ 
-    BACKEND_URL = "http://localhost:8000"
+    BACKEND_URL = "http://37.27.51.34:42679/"
     creds = None
 
     if os.path.exists(TOKEN_FILE):
@@ -104,17 +102,23 @@ def get_credentials():
         state_to_send = returned_state or expected_state
         exch = requests.post(f"{BACKEND_URL.rstrip('/')}/exchange_code", json={"code": code, "state": state_to_send}, timeout=10)
         exch.raise_for_status()
-        if not os.path.exists(TOKEN_FILE):
+
+        try:
+            exch_data = exch.json()
+        except ValueError:
+            exch_data = None
+
+        creds_data = None
+        if isinstance(exch_data, dict):
+            creds_data = exch_data.get("creds") or exch_data.get("token") or exch_data
+
+        if creds_data:
+            with open(TOKEN_FILE, "w") as token:
+                json.dump(creds_data, token)
+        elif not os.path.exists(TOKEN_FILE):
             raise FileNotFoundError(f"{TOKEN_FILE} not found after backend exchange")
+
         with open(TOKEN_FILE, "r") as token:
             creds_data = json.load(token)
             creds = Credentials.from_authorized_user_info(creds_data, SCOPES)
         return creds
-
-    if not os.path.exists(CREDENTIALS_FILE):
-        raise FileNotFoundError(f"{CREDENTIALS_FILE} not found")
-    flow = InstalledAppFlow.from_client_secrets_file(CREDENTIALS_FILE, SCOPES)
-    creds = flow.run_local_server(port=0)
-    with open(TOKEN_FILE, 'w') as token:
-        token.write(creds.to_json())
-    return creds

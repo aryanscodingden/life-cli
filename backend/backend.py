@@ -3,21 +3,20 @@ from google_auth_oauthlib.flow import InstalledAppFlow, Flow
 from google.auth.transport.requests import Request
 import os.path
 import time
-
 import json
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
+from google_auth_oauthlib.flow import Flow
 from pydantic import BaseModel
 from typing import Dict
 
 SCOPES = [
     'https://www.googleapis.com/auth/calendar',
-    #'https://www.googleapis.com/auth/calendar.events,'
     'https://www.googleapis.com/auth/tasks'
 ]
 
-CREDENTIALS_FILE = os.path.join(os.path.dirname(__file__), '..', 'credentials.json')
-TOKEN_FILE = os.path.join(os.path.dirname(__file__), '..', 'creds.json')  
+CREDENTIALS_FILE = './credentials.json'  
+TOKEN_FILE = 'creds.json'  
 
 OAUTH_STATE = {}
 
@@ -110,7 +109,23 @@ def exchange_code(req: ExchangeRequest):
         raise HTTPException(status_code=400, detail=f"Failed to fetch token: {e}")
 
     creds = flow.credentials
-    with open(TOKEN_FILE, "w") as f:
-        f.write(creds.to_json())
+    
 
-    return {"status": "ok"}
+    with open(CREDENTIALS_FILE, 'r') as f:
+        client_config = json.load(f)
+        client_info = client_config.get('installed') or client_config.get('web')
+    
+
+    creds_dict = {
+        'token': creds.token,
+        'refresh_token': creds.refresh_token,
+        'token_uri': creds.token_uri,
+        'client_id': client_info['client_id'],
+        'client_secret': client_info['client_secret'],
+        'scopes': creds.scopes
+    }
+    
+    with open(TOKEN_FILE, "w") as f:
+        json.dump(creds_dict, f)
+
+    return {"status": "ok", "creds": creds_dict}

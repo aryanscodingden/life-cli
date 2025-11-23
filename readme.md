@@ -42,29 +42,9 @@ Google Calender for events
 <br>
 
 # ❗Important❗
-## To make sure this CLI works, you must do the following steps:
- - Go to Google Cloud Console:
- - 'https://console.cloud.google.com'
- - Click Select Project → New Project
- - Name it anything (example: LifeCLI)
- - Click Create
- - In the left sidebar, click APIs & Services → Library
- - Search for each of the following and click Enable:
- - Google Calendar API
- - Google Tasks API
- - Go to APIs & Services → Credentials
- - Click Create Credentials
- - Select: Desktop Application
- - You will see Download JSON – click it.
- - This file is your 'credentials.json'
+This app will only work if you have acess to the projects oAuth, which I can't publish due to google. Please reach out to if you want to test this app & I will grant you perms! 
 
-## If you are facing a scope issue:
- Go to API & Services → OAuth Consent Screen
- Choose Internal
- Scopes page → Add + the following scopes:
-`'https://www.googleapis.com/auth/calendar', 'https://www.googleapis.com/auth/tasks'`
-
-# Sucessfully setup! Now run 'py life.py sign-in & then py life.py --help for help!
+Sucessfully setup! Now run 'py life.py sign-in & then py life.py --help for help!
 
 # Support 
-## You can mail me at aryanscode@gmail.com, or raise a issue and i'll fix it!
+You can mail me at aryanscode@gmail.com, or raise a issue and i'll fix it!
