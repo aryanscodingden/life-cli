@@ -42,7 +42,7 @@ Google Calender for events
 <br>
 
 # ❗Important❗
-This app will only work if you have acess to the projects oAuth, which I can't publish due to google. Please reach out to if you want to test this app & I will grant you perms! 
+This app will only work if you have acess to the projects oAuth, which I can't publish due to google. Please reach out to me on aryanscode@gmail.com if you want to test this app & I will grant you perms! 
 
 Sucessfully setup! Now run 'py life.py sign-in & then py life.py --help for help!
 
