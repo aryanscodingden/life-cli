@@ -17,7 +17,7 @@ This project was made for `'midnight.hackclub.com'`
 `life calender add "doctor appointment next monday 9am"`
 <br>
 
-### Time spent: 8h 37m
+### Time spent: 10h
 ## Can sync to:
 Google Tasks for tasks
 <br>
